@@ -1,0 +1,1556 @@
+
+let Morpion = [
+  [" ", " ", " "],
+  [" ", " ", " "],
+  [" ", " ", " "]
+];
+
+
+
+const Morpioncontainer = document.querySelector("#Morpion");
+const puissanceQcontainer= document.querySelector('#puissanceQ')
+const gamepiececontainer = document.querySelector("#gamepiece")
+const gameModecontainer = document.querySelector("#gameMode")
+const modeBtncontainer = document.querySelector("#modeBtn")
+const restartbtn = document.querySelector("#restartbtn");
+const resetbtncontainer = document.querySelector("#resetbtn")
+const pieceBtncontainer = document.querySelector("#pieceBtn")
+
+
+let msgEnd = document.querySelector("#msgEnd");
+
+let playerOne = "";
+let playerTwo = "";
+let iaplayer = "iapiece"
+
+let currentPlayer = playerOne;
+
+let gameEnd = false;
+
+let gameMode = "";
+
+//----------------------------------------------------------------------------------------------------------Choix Pion
+
+
+function ChoosePiece() {
+
+  gameModecontainer.style.display = 'none';
+  gamepiececontainer.style.display = 'flex';
+  pieceBtncontainer.textContent = ""
+
+ 
+
+  let purple = document.createElement("img");
+  purple.classList.add("img-piece");
+  pieceBtncontainer.appendChild(purple);
+  purple.src = "../assets/image/pionj.png";
+
+  purple.addEventListener("click", function () {
+   
+   playerOne = purple;
+   playerTwo = green;
+   
+    displaynonePack()
+    StartGame()
+
+  });
+
+  let green = document.createElement("img")
+  green.classList.add("img-piece");
+  pieceBtncontainer.appendChild(green);
+  green.src = "../assets/image/pion.png";
+
+  green.addEventListener("click", function () {
+
+    playerOne = green ;
+    playerTwo = purple;
+    
+    displaynonePack()
+    StartGame()
+  });
+
+}
+ChoosePiece()
+
+
+
+
+
+//-----------------------------------------------------------------------------------------------------------Choix mode
+
+function SelectgameMode() {
+
+
+  displaynonePack()
+  gameModecontainer.style.display = 'flex';
+  gamepiececontainer.style.display = 'none';
+
+  modeBtncontainer.textContent = ""
+
+  let vsIa = document.createElement("img");
+  vsIa.classList.add("img-gameMode");
+  modeBtncontainer.appendChild(vsIa);
+  vsIa.src = "../assets/image/ia.webp";
+
+  vsIa.addEventListener("click", function () {
+    gameMode = "vsIa";
+    
+    ChoosePiece()
+  });
+
+  let vsplayer = document.createElement("img")
+  vsplayer.classList.add("img-gameMode");
+  modeBtncontainer.appendChild(vsplayer);
+  vsplayer.src = "../assets/image/player.webp";
+
+  vsplayer.addEventListener("click", function () {
+    gameMode = "vsPlayer";
+    ChoosePiece()
+  });
+
+  gameEnd= false///// A REVOIR
+
+}
+
+SelectgameMode()
+
+
+//-------------------------------------------------------------------------------------------------------------Démarrer jeu
+
+function StartGame() {
+
+  gamepiececontainer.style.display ='none'
+  gameModecontainer.style.display = "none";
+  Morpioncontainer.style.display = "flex";
+  resetbtncontainer.style.display = "flex";
+  restartbtn.style.display = "flex"
+
+  currentPlayer = playerOne;
+  playerTwo = gameMode === "vsIa" ? iaplayer : "autreSymbole";
+
+  restartButton()
+  resetMorpion()
+  ResetGame();
+  displayMorpion();
+ 
+
+}
+
+
+
+//----------------------------------------------------------------------------------------------------------------------------------MORPION
+
+function displayMorpion() {
+
+  Morpioncontainer.textContent = "";
+
+
+  for (let i = 0; i < Morpion.length; i++) {
+    for (let j = 0; j < Morpion[i].length; j++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+
+
+      Morpioncontainer.appendChild(cell);
+
+      const imag = document.createElement('img');
+
+
+      if (Morpion[i][j] === playerOne) {
+        imag.src = "../assets/image/pionj.png";
+        imag.classList.add("imag-cell");
+        cell.appendChild(imag);
+
+      } if (Morpion[i][j] === playerTwo) {
+        imag.src = "../assets/image/pion.png";
+        imag.classList.add("imag-cell");
+        cell.appendChild(imag);
+
+      }  if (Morpion[i][j] === iaplayer && gameMode === "vsIa") {
+        imag.src = "../assets/image/pionia.png";
+        imag.classList.add("imag-cell");
+        cell.appendChild(imag);
+      }
+
+      cell.addEventListener("click", function () {
+        makeMove(i, j);
+      });
+    }
+  }
+}
+
+displayMorpion();
+
+
+
+//------------------------------------------------------------------------------------------------------Make move
+
+function makeMove(i, j) {
+
+  if (gameEnd) return;
+
+  if (Morpion[i][j] === " ") {
+    Morpion[i][j] = currentPlayer;
+    displayMorpion();
+
+    if (checkWin(Morpion, 3) ) {
+      msgEnd.textContent = currentPlayer + " à gagné !";
+      gameEnd = true;
+      return;
+    }
+
+    currentPlayer = (currentPlayer === playerOne ? playerTwo : playerOne);
+
+    if (gameMode === "vsIa" && currentPlayer === iaplayer && !gameEnd) {
+
+      disableClicks();
+      setTimeout(() => iaMove(), 1000);
+
+    }
+  }
+}
+//---------------------------------------------------------------------------------------------bloque click
+function disableClicks() {
+
+  const cells = document.querySelectorAll(".cell");
+
+  cells.forEach(function (cell) {
+    cell.style.pointerEvents = 'none';
+  });
+}
+
+function enableClicks() {
+  const cells = document.querySelectorAll(".cell");
+  cells.forEach(function (cell) {
+    cell.style.pointerEvents = 'auto';
+  });
+}
+
+// //---------------------------------------------------------------------------------------------- check win
+
+
+function checkWin(grid, cellToWin) {
+  const directions = [
+    { x: 0, y: 1 },   
+    { x: 1, y: 0 },   
+    { x: 1, y: 1 },   
+    { x: 1, y: -1 }   
+  ];
+
+  const rows = grid.length;       
+  const cols = grid[0].length;    
+
+  
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const player = grid[row][col];
+      
+      
+      if (player === null || player === " ") continue;
+
+   
+      for (const { x: dx, y: dy } of directions) {
+        if (checkDirection(grid, row, col, dx, dy, cellToWin, player)) {
+          return true; 
+        }
+      }
+    }
+  }
+  return false;
+}
+
+
+function checkDirection(grid, row, col, dx,dy, cellToWin, player) {
+  for (let i = 1; i < cellToWin; i++) {
+    const newRow = row + i * dx;
+    const newCol = col + i * dy;
+
+  
+    if (
+      newRow < 0 || newRow >= grid.length ||
+      newCol < 0 || newCol >= grid[0].length ||
+      grid[newRow][newCol] !== player
+    ) {
+      return false; 
+    }
+  }
+  return true; 
+}
+
+
+// //-------------------------------------------------------------------------------Makemove
+
+function iaMove() {
+  if (gameEnd) return;
+
+  let emptyCells = [];
+
+  for (let i = 0; i < Morpion.length; i++) {
+    for (let j = 0; j < Morpion[i].length; j++) {
+      if (Morpion[i][j] === " ") {
+        emptyCells.push({ i, j });
+      }
+    }
+  }
+
+  if (emptyCells.length > 0) {
+    let random = Math.floor(Math.random() * emptyCells.length);
+    let { i, j } = emptyCells[random];
+    Morpion[i][j] = iaplayer;
+    displayMorpion();
+
+    if (checkWin(Morpion,3)) {
+      msgEnd.textContent = iaplayer + " Won!";
+      gameEnd = true;
+
+
+    } else {
+      currentPlayer = playerOne;
+      enableClicks()
+    }
+  }
+}
+
+
+// //---------------------------------------------------------------------------------Reset Game
+function ResetGame() {
+
+
+
+
+  resetbtn.textContent = "";
+
+
+  let resetButton = document.createElement('button');
+  resetButton.textContent = "Recommencer";
+  resetbtncontainer.appendChild(resetButton);
+
+  resetButton.addEventListener("click", function () {
+
+    currentPlayer = playerOne;
+    gameEnd = false;
+    msgEnd.textContent = "";
+    resetMorpion()
+    Morpioncontainer.textContent = "";
+    displayMorpion()
+
+
+  });
+
+
+
+}
+
+//------------------------------------------------------------------------------------------restart
+
+
+function restartButton() {
+
+  restartbtn.textContent = "";
+
+  let restartButton = document.createElement('button');
+  restartButton.textContent = "Change d'Adversaire";
+  restartbtn.appendChild(restartButton);
+
+  restartButton.addEventListener("click", function () {
+    gameModecontainer.style.display = "flex";
+    ResetGame()
+    SelectgameMode();
+    displayMorpion()
+
+  });
+
+
+}
+
+
+
+
+function resetMorpion() {
+  Morpion = [
+    [" ", " ", " "],
+    [" ", " ", " "],
+    [" ", " ", " "]
+  ];
+
+}
+
+function displaynonePack(){
+  Morpioncontainer.style.display = "none";
+  resetbtncontainer.style.display = "none";
+  restartbtn.style.display = "none"
+
+}
+
+
+
+let Morpion = [
+  [null, null, null],
+  [null, null, null],
+  [null, null, null],
+];
+
+let puissanceQ = [
+  [null, null, null, null, null, null, null], 
+  [null, null, null, null, null, null, null], 
+  [null, null, null, null, null, null, null], 
+  [null, null, null, null, null, null, null], 
+  [null, null, null, null, null, null, null], 
+  [null, null, null, null, null, null, null],
+];
+
+
+
+
+const Morpioncontainer = document.querySelector("#Morpion");
+const puissanceQcontainer = document.querySelector('#puissanceQ')
+const gamepiececontainer = document.querySelector("#gamepiece")
+const gameModecontainer = document.querySelector("#gameMode")
+const modeBtncontainer = document.querySelector("#modeBtn")
+const restartbtn = document.querySelector("#restartbtn");
+const resetbtncontainer = document.querySelector("#resetbtn")
+const pieceBtncontainer = document.querySelector("#pieceBtn")
+
+
+const vsIa = createImage("../assets/image/ia.webp", 'IA', ["img-gameMode"]);
+const vsplayer = createImage("../assets/image/player.webp", 'IA', ["img-gameMode"]);
+const pieceOne = createImage('../assets/image/pionj.png', 'Joueur n°1', ["img-piece"]);
+const pieceTwo = createImage("../assets/image/pion.png", 'Joueur n°2', ["img-piece"]);
+const iaplayer = createImage("../assets/image/pionia.png", 'IA', ["imag-piece"]); 
+
+let playerOne = null;
+let playerTwo = null;       
+let currentPlayer = null;
+
+let gameEnd = false;
+
+let gameMode = "";
+
+let msgEnd = document.querySelector("#msgEnd");
+
+//----------------------------------------------------------------------------------------------------------Choix Pion
+
+function SelectgameMode() {
+
+  displaynonePack()
+  gameModecontainer.style.display = 'flex';
+  gamepiececontainer.style.display = 'none';
+  modeBtncontainer.textContent = ""
+
+  modeBtncontainer.appendChild(vsIa);
+  vsIa.addEventListener("click", function () {
+    gameMode = "vsIa";
+    ChoosePiece()
+  });
+
+  modeBtncontainer.appendChild(vsplayer);
+  vsplayer.addEventListener("click", function () {
+    gameMode = "vsPlayer";
+    ChoosePiece()
+  });
+
+  gameEnd = false///// A REVOIR
+
+}
+
+SelectgameMode()
+
+
+function ChoosePiece() {
+
+  gameModecontainer.style.display = 'none';
+  gamepiececontainer.style.display = 'flex';
+  pieceBtncontainer.textContent = ""
+
+  pieceBtncontainer.appendChild(pieceOne);
+  pieceOne.addEventListener("click", function () {
+
+    playerOne = pieceOne;
+    playerTwo = gameMode === "vsIa" ? iaplayer : pieceTwo;
+    currentPlayer = playerOne
+    displaynonePack()
+    StartGame()
+
+  });
+
+  pieceBtncontainer.appendChild(pieceTwo);
+  pieceTwo.addEventListener("click", function () {
+
+    playerOne = pieceTwo;
+    playerTwo = gameMode === "vsIa" ? iaplayer : pieceOne;
+    currentPlayer = playerOne
+    displaynonePack()
+    StartGame()
+  });
+
+}
+
+function StartGame() {
+
+  gamepiececontainer.style.display = 'none'
+  gameModecontainer.style.display = "none";
+  Morpioncontainer.style.display = "flex";
+  resetbtncontainer.style.display = "flex";
+  restartbtn.style.display = "flex"
+
+  restartButton()
+  resetMorpion()
+  ResetGame();
+  displayMorpion();
+
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------------------MORPION
+
+function displayMorpion() {
+
+  Morpioncontainer.textContent = "";
+
+  for (let i = 0; i < Morpion.length; i++) {
+    for (let j = 0; j < Morpion[i].length; j++) {
+
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+       
+      if (Morpion[i][j] === playerOne) {
+        cell.appendChild(createImage(playerOne.src, playerOne.alt, ["imag-cell"]) );
+
+      } if(Morpion[i][j] === playerTwo) {
+        cell.appendChild(createImage(playerTwo.src, playerTwo.alt, ["imag-cell"]));
+      } 
+      cell.addEventListener("click", function () {
+        makeMove(i, j);
+      });
+
+      Morpioncontainer.appendChild(cell);
+    }
+  }
+}
+
+//------------------------------------------------------------------------------------------------------Make move
+
+function makeMove(i, j) {
+
+  if (gameEnd || Morpion[i][j] !== null) return;
+
+  Morpion[i][j] = currentPlayer;
+    displayMorpion();
+
+    if (checkWin(Morpion, 3)) {
+      msgEnd.textContent = currentPlayer.alt + " à gagné !";
+      gameEnd = true;
+      return;
+    }else{
+
+    currentPlayer = (currentPlayer === playerOne ? playerTwo : playerOne);
+    }
+
+    if (gameMode === "vsIa" && currentPlayer === iaplayer && !gameEnd) {
+
+      disableClicks();
+      setTimeout(() => iaMove(), 1000);
+
+    }
+  }
+
+//---------------------------------------------------------------------------------------------bloque click
+function disableClicks() {
+
+  const cells = document.querySelectorAll(".cell");
+
+  cells.forEach(function (cell) {
+    cell.style.pointerEvents = 'none';
+  });
+}
+
+function enableClicks() {
+  const cells = document.querySelectorAll(".cell");
+  cells.forEach(function (cell) {
+    cell.style.pointerEvents = 'auto';
+  });
+}
+
+// //---------------------------------------------------------------------------------------------- check win
+
+
+function checkWin(grid, cellToWin) {
+  const directions = [
+    { x: 0, y: 1 },
+    { x: 1, y: 0 },
+    { x: 1, y: 1 },
+    { x: 1, y: -1 }
+  ];
+
+  const rows = grid.length;
+  const cols = grid[0].length;
+
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const player = grid[row][col];
+
+
+      if (player === null || player === " ") continue;
+
+
+      for (const { x: dx, y: dy } of directions) {
+        if (checkDirection(grid, row, col, dx, dy, cellToWin, player)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+
+function checkDirection(grid, row, col, dx, dy, cellToWin, player) {
+  for (let i = 1; i < cellToWin; i++) {
+    const newRow = row + i * dx;
+    const newCol = col + i * dy;
+
+
+    if (
+      newRow < 0 || newRow >= grid.length ||
+      newCol < 0 || newCol >= grid[0].length ||
+      grid[newRow][newCol] !== player
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+// //-------------------------------------------------------------------------------Makemove
+
+function iaMove() {
+  if (gameEnd) return;
+
+  let emptyCells = [];
+
+  for (let i = 0; i < Morpion.length; i++) {
+    for (let j = 0; j < Morpion[i].length; j++) {
+      if (Morpion[i][j] === null) {
+        emptyCells.push({ i, j });
+      }
+    }
+  }
+
+  if (emptyCells.length > 0) {
+    let random = Math.floor(Math.random() * emptyCells.length);
+    let { i, j } = emptyCells[random];
+    Morpion[i][j] = iaplayer;
+    displayMorpion();
+
+    if (checkWin(Morpion, 3)) {
+      msgEnd.textContent = iaplayer.alt + " Won!";
+      gameEnd = true;
+    } else {
+      currentPlayer = playerOne;
+      enableClicks()
+    }
+  }
+}
+
+
+// //---------------------------------------------------------------------------------Reset Game
+function ResetGame() {
+
+  resetbtn.textContent = "";
+
+  let resetButton = document.createElement('button');
+  resetButton.textContent = "Recommencer";
+  resetbtncontainer.appendChild(resetButton);
+
+  resetButton.addEventListener("click", function () {
+
+    currentPlayer = playerOne;
+    gameEnd = false;
+    msgEnd.textContent = "";
+    resetMorpion()
+    Morpioncontainer.textContent = "";
+    displayMorpion()
+
+
+  });
+      
+
+}
+
+//------------------------------------------------------------------------------------------restart
+
+
+function restartButton() {
+
+  restartbtn.textContent = "";
+
+  let restartButton = document.createElement('button');
+  restartButton.textContent = "Change d'Adversaire";
+  restartbtn.appendChild(restartButton);
+
+  restartButton.addEventListener("click", function () {
+    gameModecontainer.style.display = "flex";
+    playerOne = null;
+    playerTwo = null;
+    currentPlayer = null;
+    gameEnd = false;
+    msgEnd.textContent = "";
+    ResetGame()
+    SelectgameMode();
+    ChoosePiece()
+    displayMorpion()
+
+  });
+
+}
+
+
+function resetMorpion() {
+  Morpion = [
+    [null, null, null],
+    [null, null, null],
+    [null, null, null],
+  ];
+  
+}
+
+function displaynonePack() {
+  Morpioncontainer.style.display = "none";
+  resetbtncontainer.style.display = "none";
+  restartbtn.style.display = "none"
+
+}
+
+function createImage(src, alt, classes = []) {
+  const img = new Image();
+  img.src = src;
+  img.alt = alt;
+
+  classes.forEach(className => img.classList.add(className));
+
+  return img;
+}
+
+let Morpion = [
+  [null, null, null],
+  [null, null, null],
+  [null, null, null],
+];
+
+let puissanceQ = [
+  [null, null, null, null, null, null, null], 
+  [null, null, null, null, null, null, null], 
+  [null, null, null, null, null, null, null], 
+  [null, null, null, null, null, null, null], 
+  [null, null, null, null, null, null, null], 
+  [null, null, null, null, null, null, null],
+];
+
+
+const MorpionContainer = document.querySelector(" #Morpion");
+const puissanceQcontainer = document.querySelector('#puissanceQ')
+const gamepiececontainer = document.querySelector("#gamepiece")
+const gameModecontainer = document.querySelector("#gameMode")
+const modeBtncontainer = document.querySelector("#modeBtn")
+const restartbtn = document.querySelector("#restartbtn");
+const resetbtncontainer = document.querySelector("#resetbtn")
+const pieceBtncontainer = document.querySelector("#pieceBtn")
+
+
+const vsIa = createImage("../assets/image/ia.webp", 'IA', ["img-gameMode"]);
+const vsplayer = createImage("../assets/image/player.webp", 'IA', ["img-gameMode"]);
+const pieceOne = createImage('../assets/image/pionj.png', 'Joueur n°1', ["img-piece"]);
+const pieceTwo = createImage("../assets/image/pion.png", 'Joueur n°2', ["img-piece"]);
+const iaplayer = createImage("../assets/image/pionia.png", 'IA', ["imag-piece"]); 
+
+let playerOne = null;
+let playerTwo = null;       
+let currentPlayer = null;
+
+let gameEnd = false;
+
+let gameMode = "";
+
+let msgEnd = document.querySelector("#msgEnd");
+
+
+
+//----------------------------------------------------------------------------------------------------------Choix Pion
+
+function SelectgameMode() {
+
+  displaynonePack()
+  gameModecontainer.style.display = 'flex';
+  gamepiececontainer.style.display = 'none';
+  modeBtncontainer.textContent = ""
+
+  modeBtncontainer.appendChild(vsIa);
+  vsIa.addEventListener("click", function () {
+    gameMode = "vsIa";
+    ChoosePiece()
+  });
+
+  modeBtncontainer.appendChild(vsplayer);
+  vsplayer.addEventListener("click", function () {
+    gameMode = "vsPlayer";
+    ChoosePiece()
+  });
+
+}
+
+SelectgameMode()
+
+
+function ChoosePiece() {
+
+  gameModecontainer.style.display = 'none';
+  gamepiececontainer.style.display = 'flex';
+  pieceBtncontainer.textContent = ""
+
+  pieceBtncontainer.appendChild(pieceOne);
+  pieceOne.addEventListener("click", function () {
+
+    playerOne = pieceOne;
+    playerTwo = gameMode === "vsIa" ? iaplayer : pieceTwo;
+    currentPlayer = playerOne
+    displaynonePack()
+    StartGame()
+
+  });
+
+  pieceBtncontainer.appendChild(pieceTwo);
+  pieceTwo.addEventListener("click", function () {
+
+    playerOne = pieceTwo;
+    playerTwo = gameMode === "vsIa" ? iaplayer : pieceOne;
+    currentPlayer = playerOne
+    displaynonePack()
+    StartGame()
+  });
+
+}
+
+function StartGame() {
+
+  gamepiececontainer.style.display = 'none'
+  gameModecontainer.style.display = "none";
+  MorpionContainer.style.display = "flex";
+  resetbtncontainer.style.display = "flex";
+  restartbtn.style.display = "flex"
+
+  restartButton()
+  resetMorpion()
+  ResetGame();
+  displayMorpion();
+  displayPQ()
+
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------------------MORPION
+
+function displayGrid(grid, container, cellClass, moveFunction
+) {
+
+ container.textContent = "";
+
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+
+      const cell = document.createElement("div");
+      cell.classList.add(cellClass);
+       
+      if (grid[i][j] === playerOne) {
+        cell.appendChild(createImage(playerOne.src, playerOne.alt, ["imag-cell"]) );
+
+      } if(grid[i][j] === playerTwo) {
+        cell.appendChild(createImage(playerTwo.src, playerTwo.alt, ["imag-cell"]));
+      } 
+      cell.addEventListener("click", function () {
+        moveFunction(i,j)
+        
+      });
+
+     container.appendChild(cell);
+    }
+  }
+}
+
+function displayMorpion() {
+  displayGrid(Morpion, MorpionContainer, "cell",MakeMoveMorpion);
+}
+
+function displayPQ() {
+  displayGrid(puissanceQ, puissanceQcontainer, "cellQ",makeMovePuissanceQ);
+}
+
+//------------------------------------------------------------------------------------------------------Make move
+
+function MakeMoveMorpion(i, j) {
+
+  if (gameEnd || Morpion[i][j] !== null) return;
+
+  Morpion[i][j] = currentPlayer;
+    displayMorpion();
+
+    if (checkGameEnd(Morpion, 3)) 
+      return;
+    switchPlayer(); 
+    playAI(Morpion, displayMorpion, 3); 
+  }
+
+ 
+function aiMorpion() {
+  if (gameEnd) return;
+
+  let emptyCells = [];
+
+  for (let i = 0; i < Morpion.length; i++) {
+    for (let j = 0; j < Morpion[i].length; j++) {
+      if (Morpion[i][j] === null) {
+        emptyCells.push({ i, j });
+      }
+    }
+  }
+
+ 
+  if (emptyCells.length > 0) {
+    const { i, j } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    Morpion[i][j] = iaplayer;
+    displayMorpion();
+
+    if (checkWin(Morpion, 3)) {
+      msgEnd.textContent = iaplayer.alt + "a gagné!";
+      gameEnd = true;
+    } else {
+      currentPlayer = playerOne;
+      enableClicks();
+    }
+  }
+}
+
+function makeMovePuissanceQ(i,j) {
+  if (gameEnd) return;
+
+  for (let row = puissanceQ.length - 1; row >= 0; row--) {
+    if (puissanceQ[row][j] === null) {
+      puissanceQ[row][j] = currentPlayer;
+      displayPQ();
+
+      if (checkGameEnd(puissanceQ, 4)) return;
+
+      switchPlayer(); 
+      playAI(puissanceQ, displayPQ, 4); 
+
+      break;
+    }
+  }  
+}  
+
+function iaMovePuissanceQ() {
+  if (gameEnd) return;
+
+  let colSelected = Math.floor(Math.random() * puissanceQ[0].length);
+
+  // Parcourir la colonne de bas en haut pour trouver la première cellule vide
+  for (let row = puissanceQ.length - 1; row >= 0; row--) {
+    if (puissanceQ[row][colSelected] === null) {
+      puissanceQ[row][colSelected] = iaplayer;
+      displayPQ();
+
+      if (checkWin(puissanceQ, 4)) {
+        msgEnd.textContent = iaplayer.alt  +"a gagné!";
+        gameEnd = true;
+      } else {
+        currentPlayer = playerOne;
+      }
+      break; 
+    }
+  }
+}
+function iaMove(grid) {
+  if (grid === Morpion) {
+    aiMorpion();
+  } else if (grid === puissanceQ) {
+    iaMovePuissanceQ();
+  }
+}
+
+function checkWin(grid, cellToWin) {
+  const directions = [
+    { x: 0, y: 1 },
+    { x: 1, y: 0 },
+    { x: 1, y: 1 },
+    { x: 1, y: -1 }
+  ];
+
+  const rows = grid.length;
+  const cols = grid[0].length;
+
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const player = grid[row][col];
+
+      if (player === null || player === " ") continue;
+
+      for (const { x: dx, y: dy } of directions) {
+        if (checkDirection(grid, row, col, dx, dy, cellToWin, player)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+
+function checkDirection(grid, row, col, dx, dy, cellToWin, player) {
+  for (let i = 1; i < cellToWin; i++) {
+    const newRow = row + i * dx;
+    const newCol = col + i * dy;
+
+
+    if (
+      newRow < 0 || newRow >= grid.length ||
+      newCol < 0 || newCol >= grid[0].length ||
+      grid[newRow][newCol] !== player
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+////////////////////////////////////////////----------BUTTON
+
+// //---------------------------------------------------------------------------------Reset Game
+function ResetGame() {
+
+  resetbtn.textContent = "";
+
+  let resetButton = document.createElement('button');
+  resetButton.textContent = "Recommencer";
+  resetbtncontainer.appendChild(resetButton);
+
+  resetButton.addEventListener("click", function () {
+
+    currentPlayer = playerOne;
+    gameEnd = false;
+    msgEnd.textContent = "";
+    resetMorpion()
+   MorpionContainer.textContent = "";
+    displayMorpion()
+
+
+  });
+      
+
+}
+
+//------------------------------------------------------------------------------------------restart
+
+
+function restartButton() {
+
+  restartbtn.textContent = "";
+
+  let restartButton = document.createElement('button');
+  restartButton.textContent = "Change d'Adversaire";
+  restartbtn.appendChild(restartButton);
+
+  restartButton.addEventListener("click", function () {
+    gameModecontainer.style.display = "flex";
+    playerOne = null;
+    playerTwo = null;
+    currentPlayer = null;
+    gameEnd = false;
+    msgEnd.textContent = "";
+    ResetGame()
+    SelectgameMode();
+    displayMorpion()
+
+  });
+
+}
+
+
+
+
+/////////////////////////////////////////////// GENERIQUE
+
+
+
+//---------------------------------------------------------------------------------------------bloque click
+function resetMorpion() {
+  Morpion = [
+    [null, null, null],
+    [null, null, null],
+    [null, null, null],
+  ];
+  
+}
+
+function switchPlayer() {
+  currentPlayer = (currentPlayer === playerOne ? playerTwo : playerOne);
+}
+
+function playAI(grid, displayFunction, cellsToWin) {
+  if (gameMode === "vsIa" && currentPlayer === iaplayer && !gameEnd) {
+    disableClicks();
+    setTimeout(() => {
+      if (grid === Morpion) {
+        aiMorpion(); // Appelle l'IA pour Morpion
+      } else if (grid === puissanceQ) {
+        iaMovePuissanceQ(); // Appelle l'IA pour puissanceQ
+      }
+      displayFunction(); // Met à jour l'affichage après le coup de l'IA
+    }, 1000);
+  }
+}
+
+function disableClicks() {
+
+  const cells = document.querySelectorAll(".cell");
+
+  cells.forEach(function (cell) {
+    cell.style.pointerEvents = 'none';
+  });
+}
+
+function enableClicks() {
+  const cells = document.querySelectorAll(".cell");
+  cells.forEach(function (cell) {
+    cell.style.pointerEvents = 'auto';
+  });
+}
+
+
+function displaynonePack() {
+ MorpionContainer.style.display = "none";
+ 
+  resetbtncontainer.style.display = "none";
+  restartbtn.style.display = "none"
+}
+
+function checkGameEnd(grid, cellsToWin) {
+  if (checkWin(grid, cellsToWin)) {
+    msgEnd.textContent = currentPlayer.alt + " a gagné !";
+    gameEnd = true;
+    return true;
+  }
+  return false;
+}
+
+
+
+
+function createImage(src, alt, classes = []) {
+  const img = new Image();
+  img.src = src;
+  img.alt = alt;
+
+  classes.forEach(className => img.classList.add(className));
+
+  return img;
+}
+
+
+
+function createGrid(rows, cols) {
+  return Array.from({ length: rows }, () => Array(cols).fill(null));
+}
+
+let Morpion = createGrid(3, 3);
+let puissanceQ = createGrid(6, 7); 
+
+
+const MorpionContainer = document.querySelector(" #Morpion");
+const puissanceQcontainer = document.querySelector('#puissanceQ')
+const gamepiececontainer = document.querySelector("#gamepiece")
+const gameModecontainer = document.querySelector("#gameMode")
+const modeBtncontainer = document.querySelector("#modeBtn")
+const restartbtn = document.querySelector("#restartbtn");
+const resetbtncontainer = document.querySelector("#resetbtn")
+const pieceBtncontainer = document.querySelector("#pieceBtn")
+const startmorpionContainer = document.querySelector("#startMorpion")
+const startPuissanceQContainer = document.querySelector("#starPuissanceQ")
+
+const vsIa = createImage("../assets/image/ia.webp", 'IA', ["img-gameMode"]);
+const vsplayer = createImage("../assets/image/player.webp", 'IA', ["img-gameMode"]);
+const pieceOne = createImage('../assets/image/pionj.png', 'Joueur n°1', ["img-piece"]);
+const pieceTwo = createImage("../assets/image/pion.png", 'Joueur n°2', ["img-piece"]);
+const iaplayer = createImage("../assets/image/pionia.png", 'IA', ["imag-piece"]);
+
+let playerOne = null;
+let playerTwo = null;
+let currentPlayer = null;
+ 
+
+let gameEnd = false;
+
+let gameMode = "";
+
+let msgEnd = document.querySelector("#msgEnd");
+
+
+//----------------------------------------------------------------------------------------------------------Choix Pion
+
+function SelectgameMode() {
+
+  displaynonePack()
+  gameModecontainer.style.display = 'flex';
+  gamepiececontainer.style.display = 'none';
+  modeBtncontainer.textContent = ""
+
+  modeBtncontainer.appendChild(vsIa);
+  vsIa.addEventListener("click", ()=>{
+    gameMode = "vsIa";
+    ChoosePiece()
+  });
+
+  modeBtncontainer.appendChild(vsplayer);
+  vsplayer.addEventListener("click", ()=>{
+    gameMode = "vsPlayer";
+    ChoosePiece()
+  });
+
+}
+
+SelectgameMode()
+
+function ChoosePiece() {
+
+  gameModecontainer.style.display = 'none';
+  gamepiececontainer.style.display = 'flex';
+  pieceBtncontainer.textContent = ""
+
+  pieceBtncontainer.appendChild(pieceOne);
+  pieceOne.addEventListener("click",() =>{
+
+    playerOne = pieceOne;
+    playerTwo = gameMode === "vsIa" ? iaplayer : pieceTwo;
+    currentPlayer = playerOne
+    displaynonePack()
+    StartGame()
+    
+  });
+
+  pieceBtncontainer.appendChild(pieceTwo);
+  pieceTwo.addEventListener("click", ()=> {
+
+    playerOne = pieceTwo;
+    playerTwo = gameMode === "vsIa" ? iaplayer : pieceOne;
+    currentPlayer = playerOne
+    displaynonePack()
+    StartGame()
+    
+  });
+
+}
+
+
+function StartGame() {
+
+  gamepiececontainer.style.display = 'none'
+  gameModecontainer.style.display = "none";
+  MorpionContainer.style.display = "flex";
+  puissanceQcontainer.style.display="grid"
+  resetbtncontainer.style.display = "flex";
+  restartbtn.style.display = "flex"
+
+  restartButton()
+  resetPQ()
+  resetMorpion()
+  ResetGame();
+  displayPQ();
+  displayMorpion()
+}
+
+
+/////////////////////////////////////MORPION
+
+function displayMorpion() {
+  displayGrid(Morpion, MorpionContainer, "cell", MakeMoveMorpion);
+}
+
+function MakeMoveMorpion(i, j) {
+  if (gameEnd || Morpion[i][j] !== null) return;
+
+  Morpion[i][j] = currentPlayer;
+  displayMorpion();
+
+  if (checkGameEnd(Morpion, 3))
+    return;
+  switchPlayer();
+  playAI(Morpion, displayMorpion, 3);
+}
+
+function aiMorpion() {
+  if (gameEnd) return;
+
+  let emptyCells = [];
+
+  Morpion.forEach((row, i) => {
+    row.forEach((cell, j) => {
+      if (cell === null) emptyCells.push({ i, j });
+    });
+  });
+
+  if (emptyCells.length > 0) {
+    const { i, j } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    Morpion[i][j] = iaplayer;
+    displayMorpion();
+
+    if (checkWin(Morpion, 3)) {
+      msgEnd.textContent = iaplayer.alt + "a gagné!";
+      gameEnd = true;
+    } else {
+      currentPlayer = playerOne;
+      toggleClicks(true);
+    }
+  }
+}
+
+///////////////////////////////////////////////////// PUISSANCE4
+
+function displayPQ() {
+  displayGrid(puissanceQ, puissanceQcontainer, "cellQ", makeMovePuissanceQ);
+}
+
+
+  function makeMovePuissanceQ(i, j) {
+    if (gameEnd) return;
+
+    for (let row = puissanceQ.length - 1; row >= 0; row--) {
+      if (puissanceQ[row][j] === null) {
+        puissanceQ[row][j] = currentPlayer;
+        displayPQ();
+
+        if (checkGameEnd(puissanceQ, 4)) return;
+
+        switchPlayer();
+        playAI(puissanceQ, displayPQ, 4);
+
+        break;
+      }
+    }
+  }
+
+  function iaMovePuissanceQ() {
+    if (gameEnd) return;
+
+    let colSelected = Math.floor(Math.random() * puissanceQ[0].length);
+
+    for (let row = puissanceQ.length - 1; row >= 0; row--) {
+      if (puissanceQ[row][colSelected] === null) {
+        puissanceQ[row][colSelected] = iaplayer;
+        displayPQ();
+
+        if (checkWin(puissanceQ, 4)) {
+          msgEnd.textContent = iaplayer.alt + "a gagné!";
+          gameEnd = true;
+        } else {
+          currentPlayer = playerOne;
+          toggleClicks(true);
+        }
+        break;
+      }
+    }
+  }
+
+
+
+////////////////////////////////////////////----------BUTTON
+function playAI(grid, displayFunction, cellsToWin) {
+  if (gameMode === "vsIa" && currentPlayer === iaplayer && !gameEnd) {
+    toggleClicks(false);
+    setTimeout(() => {
+      if (grid === Morpion) {
+        aiMorpion();
+      } else if (grid === puissanceQ) {
+        iaMovePuissanceQ();
+      }
+      displayFunction();
+    }, 1000);
+  }
+}
+
+function ResetGame() {
+  resetbtn.textContent = "";
+
+  const resetButton = createButton("Recommencer",()=> {;
+    currentPlayer = playerOne;
+    gameEnd = false;
+    msgEnd.textContent = "";
+    resetMorpion()
+    resetPQ()
+    displayMorpion()
+    displayPQ()
+    
+  });
+  resetbtncontainer.appendChild(resetButton);
+}
+
+function restartButton() {
+  restartbtn.textContent = "";
+
+ const restartButton = createButton("Change d'Adversaire",()=>{
+
+    gameModecontainer.style.display = "flex";
+    playerOne = null;
+    playerTwo = null;
+    currentPlayer = null;
+    gameEnd = false;
+    msgEnd.textContent = "";
+    ResetGame()
+    SelectgameMode();
+    
+  });
+  restartbtn.appendChild(restartButton);
+}
+
+
+/////////////////////////////////////////////// GENERIQUE
+function displayGrid(grid, container, cellClass, moveFunction) {
+  container.textContent = "";
+
+  grid.forEach((row, i) => {
+    row.forEach((cell, j) => {
+      const cellElement = document.createElement("div");
+      cellElement.classList.add(cellClass);
+
+      if (cell) {
+        cellElement.appendChild(createImage(cell.src, cell.alt, ["imag-cell"]));
+      }
+
+      cellElement.addEventListener("click", () => moveFunction(i, j));
+      container.appendChild(cellElement);
+    });
+  });
+}
+
+function checkWin(grid, cellToWin) {
+  const directions = [
+    { x: 0, y: 1 },  
+    { x: 1, y: 0 }, 
+    { x: 1, y: 1 },  
+    { x: 1, y: -1 }  
+  ];
+
+  for (let row = 0; row < grid.length; row++) {
+    for (let col = 0; col < grid[row].length; col++) {
+      const player = grid[row][col];
+      if (!player) continue;
+
+      for (const { x: dx, y: dy } of directions) {
+        if (checkDirection(grid, row, col, dx, dy, cellToWin, player)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function checkDirection(grid, row, col, dx, dy, cellToWin, player) {
+  for (let i = 1; i < cellToWin; i++) {
+    const newRow = row + i * dx;
+    const newCol = col + i * dy;
+
+    if (
+      newRow < 0 || newRow >= grid.length ||
+      newCol < 0 || newCol >= grid[0].length ||
+      grid[newRow][newCol] !== player
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+//---------------------------------------------------------------------------------------------bloque click
+
+function toggleClicks(isEnabled) {
+  const cells = document.querySelectorAll(".cell,.cellQ");
+  cells.forEach(cell => {
+    cell.style.pointerEvents = isEnabled ? 'auto' : 'none';
+  });
+}
+
+function displaynonePack() {
+  MorpionContainer.style.display = "none";
+  puissanceQcontainer.style.display ="none";
+  resetbtncontainer.style.display = "none";
+  restartbtn.style.display = "none"
+}
+
+function checkGameEnd(grid, cellsToWin) {
+
+  if (checkWin(grid, cellsToWin)) {
+    msgEnd.textContent = currentPlayer.alt + " a gagné !";
+    gameEnd = true;
+    return true;
+  }
+
+ 
+  if (checkDraw(grid)) {
+    msgEnd.textContent = "Match nul !";
+    gameEnd = true;
+    return true;
+  }
+
+  return false;
+}
+
+
+function checkDraw(grid) {
+ 
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      if (grid[i][j] === null) {
+        return false; 
+      }
+    }
+  }
+  return true; 
+}
+
+
+function switchPlayer() {
+  currentPlayer = (currentPlayer === playerOne ? playerTwo : playerOne);
+}
+
+function createImage(src, alt, classes = []) {
+  const img = new Image();
+  img.src = src;
+  img.alt = alt;
+
+  classes.forEach(className => img.classList.add(className));
+
+  return img;
+}
+function createButton(text, onClickFunction) {
+  const button = document.createElement('button');
+  button.textContent = text;
+  button.addEventListener("click", onClickFunction);
+  return button;
+}
+
+
+function resetGrid(rows, cols) {
+  return Array.from({ length: rows }, () => Array(cols).fill(null));
+}
+
+const resetMorpion=() => {
+  Morpion = resetGrid(3, 3); 
+}
+
+const resetPQ=() => {
+  puissanceQ = resetGrid(6, 7); 
+}
+

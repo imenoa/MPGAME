@@ -1,0 +1,345 @@
+body {
+    margin: 0;
+    background-image: url(../image/back.webp);
+    background-size: cover;
+    background-repeat: no-repeat;
+    color: whitesmoke;
+    font-family: "Uncial Antiqua", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 10px;
+
+
+}
+
+header {
+    display: flex;
+    justify-content: space-around;
+    width: 90vw;
+   margin-bottom: 30px;
+}
+
+
+header button {
+    margin-top: 60px;
+    width: 15vw;
+    height: 10vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.475);
+    color: white;
+    font-family: "Uncial Antiqua", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 20px;
+    border-radius: 8%;
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.653);
+    text-shadow:
+        0 0 5px rgb(22, 19, 1),
+        0 0 10px rgb(7, 6, 1),
+        0 0 50px violet,
+        0 0 20px rgb(9, 0, 9),
+        0 0 25px rgb(0, 0, 0),
+        0 0 25px gold;
+    cursor: pointer;
+}
+
+
+h1 {
+    margin-bottom: 40px;
+    font-size: 40px;
+    background-color: rgba(0, 0, 0, 0.378);
+    padding: 1.5%;
+    border-radius: 8%;
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.8);
+    text-shadow:
+        0 0 5px rgb(22, 19, 1),
+        0 0 10px rgb(7, 6, 1),
+        0 0 50px violet,
+        0 0 20px violet,
+        0 0 25px rgb(0, 0, 0),
+        0 0 25px gold;
+        cursor: pointer;
+}
+
+h2 {
+
+    background-color: rgba(0, 0, 0, 0.203);
+    padding: 2%;
+    border-radius: 8%;
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.653);
+    font-size: 30px;
+    text-shadow:
+        0 0 5px rgb(22, 19, 1),
+        0 0 10px rgb(7, 6, 1),
+        0 0 50px violet,
+        0 0 20px rgb(9, 0, 9),
+        0 0 25px rgb(0, 0, 0),
+        0 0 25px gold;
+
+}
+
+
+
+#gameMode,
+#game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 70px;
+    background-color: rgba(0, 0, 0, 0.203);
+    padding: 5%;
+    border-radius: 8%;
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.653);
+
+}
+
+#modeBtn,
+#pieceBtn,
+#gamechoice {
+    display: flex;
+    justify-content: space-around;
+    gap: 200px;
+
+}
+
+#Morpion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(55, 25, 25, 0.33);
+    height: 500px;
+    width: 500px;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 10%;
+    border-radius: 50%;
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.8);
+ 
+
+}
+
+#puissanceQ {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    justify-content: space-around;
+    align-items: center;
+    background-color: rgba(30, 15, 15, 0.432);
+    height: calc(50vh-400px);
+    width: calc(70vw-20px);
+    object-fit: contain;
+    gap: 30px;
+    padding: 2%;
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.8);
+    margin-top: 10px;
+    margin-bottom: 50px;
+}
+
+.cellQ {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background-color: rgba(29, 1, 1, 0.286);
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+}
+
+
+.cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30%;
+    height: 30%;
+    background-color: rgba(29, 1, 1, 0.286);
+    border-radius: 50%;
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+
+
+}
+
+.imag-cell .img-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 110%;
+    height: 115%;
+    border-radius: 50%;
+    transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
+
+
+}
+
+img {
+    width: 120%;
+    height: 120%;
+    object-fit: cover;
+
+}
+
+.imag-cell img {
+
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+
+}
+
+
+
+#gamepiece {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 70px;
+    background-color: rgba(0, 0, 0, 0.203);
+    padding: 5%;
+    border-radius: 8%;
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.653);
+
+}
+
+
+.img-gameMode {
+    height: 300px;
+    width: 300px;
+    border-radius: 50%;
+    box-shadow: 0 0 20px 10px rgb(6, 0, 11);
+    transform: scale(1.05);
+
+}
+
+
+.img-piece,
+.img-gameMode:hover {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+    cursor: pointer;
+}
+
+
+
+.img-piece {
+    height: 300px;
+    width: 300px;
+    border-radius: 50%;
+
+    transform: scale(1.05);
+
+}
+
+
+.img-piece:hover {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+    cursor: pointer;
+}
+
+
+
+#gamebuttons {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    width: 80vw;
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+    margin-bottom: 20px;
+
+}
+
+#gamebuttons button {
+    width: 20vw;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.475);
+    color: white;
+    font-family: "Uncial Antiqua", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 20px;
+    border-radius: 8%;
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.653);
+    text-shadow:
+        0 0 5px rgb(22, 19, 1),
+        0 0 10px rgb(7, 6, 1),
+        0 0 50px violet,
+        0 0 20px rgb(9, 0, 9),
+        0 0 25px rgb(0, 0, 0),
+        0 0 25px gold;
+    cursor: pointer;
+}
+
+#gamechoice button {
+    width: 20vw;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.475);
+    color: white;
+    font-family: "Uncial Antiqua", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 20px;
+    border-radius: 8%;
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.653);
+    text-shadow:
+        0 0 5px rgb(22, 19, 1),
+        0 0 10px rgb(7, 6, 1),
+        0 0 50px violet,
+        0 0 20px rgb(9, 0, 9),
+        0 0 25px rgb(0, 0, 0),
+        0 0 25px gold;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+#msgEnd {
+  position: fixed;
+  top:30%;
+  width: 400px;
+  height: 300px;
+  border-radius: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7); 
+  box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.653);
+  color: white;
+  font-size: 2rem;
+  font-family: "Uncial Antiqua", system-ui;
+  font-weight: 400;
+  text-align: center;
+  z-index: 10; 
+  opacity: 0;
+  pointer-events: none; 
+  transition: opacity 0.5s ease; 
+}
+
+#msgEnd.show {
+  opacity: 1;
+  pointer-events: auto; 
+}
